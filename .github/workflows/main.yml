@@ -1,0 +1,70 @@
+name: Update subconverter
+env:
+  # 提交说明的内容
+  message: 'Update subconverter'
+
+on:
+  # 定时任务，格式：minute(0 - 59) hour(0 - 23) day_of_the month (1 - 31) month(1 - 12 or JAN-DEC) day of the week (0 - 6 or SUN-SAT)
+  # 以下示例为每周日0点0分运行
+  # 删除以下行首的#号启用定时任务
+  # schedule:
+  #   - cron: 0 0 * * SUN
+  # 点击star运行
+  # 删除以下行首的#号启用
+  #watch:
+  #  types: [started]
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'commit message'
+        required: false
+        default: 'Update subconverter'
+
+concurrency: 
+  group: subconverter
+  # 自动取消其他运行中的workflow
+  cancel-in-progress: true   
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 'Get latest commit sha'
+      id: get_sha
+      uses: mego22/actions-git-sha@main
+      with:
+        repo: "https://github.com/tindy2013/subconverter.git"
+    - name: Update Version
+      run: |
+        export TZ='Asia/Shanghai'
+        time=$(date "+%Y-%m-%d %H:%M:%S")
+        echo -e "git sha:${{ steps.get_sha.outputs.sha }}\ntime:$time" > version
+    - name: variable mapper
+      id: export
+      uses: kanga333/variable-mapper@master
+      with:
+        key: "${{ github.event_name }}"
+        map: |
+          {
+            "workflow_dispatch": {
+              "message": "${{ github.event.inputs.message }}"
+            },
+            ".*": {
+              "message": "${{ env.message }}"
+            }
+          }
+        export_to: output,env
+
+    - name: Add & Commit
+      uses: EndBug/add-and-commit@v6
+      with:
+        author_name: GitHub Action
+        author_email: noreply@github.com
+        message: ${{ env.message }}
+        add: "-A"
+      env:
+        token: ${{ secrets.GITHUB_TOKEN }}
