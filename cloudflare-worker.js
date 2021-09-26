@@ -1,9 +1,30 @@
 // 编辑为你的后端地址
 const api = "https://your subconverter.up.railway.app";
 // 设置被屏蔽的订阅链接黑名单
-blacklist = {"url":[ "http(s)?:\/\/.*githubusercontent", "http(s)?:\/\/github.com" ]};
+const blacklist = {"url":[
+  /http(s)?:\/\/.*\.(now\.sh|vercel\.app)/,
+  /(ss|free|proxy)\./,
+  /\d+.xyz/,
+  /\.(ml|cf|tk|ga|gq)/,
+  /(ssr?|clash|v2ray|proxy)pool/,
+  "githubusercontent",
+  "github.com",
+  "github.io",
+  "gitlab.com",
+  "bitbucket.org",
+  "raw.fastgit.org",
+  "jsdelivr.net",
+  "herokuapp",
+  "netlify",
+  "railway.app",
+  "workers.dev",
+  "stgod",
+  "lonxin",
+  "linbaoz",
+  "luoml"
+  ]}; 
 // 设置白名单IP
-whitelist = [ ".*" ];
+const whitelist = [ ".*" ];
 addEventListener("fetch", (event) => {
   event.respondWith(
     handleRequest(event.request).catch(
@@ -35,14 +56,11 @@ async function handleRequest(request) {
   var sub_url = decodeURI(origin_url.searchParams.get("url")||"");
   console.log(sub_url);
   if ((!isListed(sub_url, blacklist.url)) && (isListed(orig, whitelist))) {
-    newreq = new Request(request,{
+    let newreq = new Request(request,{
       "headers": request.headers
     });
-    let fetch_url = api + origin_url.pathname;
-    let params = origin_url.search
-    if (params) {
-      fetch_url += params;
-    }
+    const { pathname, search } = origin_url;
+    let fetch_url = api + pathname + search;
     //console.log(fetch_url);
     let response = await fetch(fetch_url,newreq);
     let myHeaders = new Headers(response.headers);
