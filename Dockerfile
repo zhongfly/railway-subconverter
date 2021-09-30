@@ -43,8 +43,8 @@ RUN apk add --no-cache --virtual .build-tools git g++ build-base linux-headers c
     apk add --no-cache --virtual subconverter-deps pcre2 libcurl yaml-cpp libevent && \
     apk del .build-tools .build-deps
 
+COPY files/ /base/
 # set entry
 WORKDIR /base
-COPY files/ /base/
 EXPOSE 25500
 CMD subconverter
