@@ -35,9 +35,15 @@ jobs:
     - uses: actions/checkout@v2
     - name: 'Get latest commit sha'
       id: get_sha
-      uses: mego22/actions-git-sha@main
+      uses: actions/github-script@v5
       with:
-        repo: "https://github.com/tindy2013/subconverter.git"
+        script: |
+          const commit = await github.rest.repos.getCommit({
+            owner: 'tindy2013',
+            repo: 'subconverter',
+            ref: `master`
+          })
+          core.setOutput('sha', String(commit.data.sha))
     - name: Update Version
       run: |
         export TZ='Asia/Shanghai'
