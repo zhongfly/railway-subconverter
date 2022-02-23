@@ -2,6 +2,11 @@ name: Update sub-web
 
 on:
   workflow_dispatch:
+    inputs:
+      repo:
+        description: 'sub-web source repo'
+        required: true
+        default: 'CareyWang/sub-web'
 
 concurrency: 
   group: sub-web
@@ -14,28 +19,33 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x]
+        node-version: [14]
 
     steps:
     - uses: actions/checkout@v2
+    - name: Checkout toolchain repo
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.event.inputs.repo }}
+        path: sub-web
 
     - name: Update sub-web
       run: |
         git clone https://github.com/CareyWang/sub-web.git
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
 
     - name: Get dependencies and build
+      working-directory: sub-web
       run: |
-        cd sub-web
         yarn install
         yarn build
         
     - name: Clean up
       run: |
-        cd $GITHUB_WORKSPACE
         sudo rm -rf files/dist
         sudo cp -rf sub-web/dist files/
         sudo rm -rf sub-web
