@@ -1,6 +1,8 @@
 # railway-subconverter
 在Railway.app上搭建subconverter
 
+**提醒：可能会被Railway.app以“Xray”的不明理由封号**
+
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2Fzhongfly%2Frailway-subconverter&referralCode=y7njpi)
 
 将配置文件等放在files/文件夹内
